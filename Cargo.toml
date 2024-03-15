@@ -21,6 +21,7 @@ clap = { version = "4.5.1", features = ["cargo"] }
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
 futures = "0.3.30"
+gethostname = "0.4.3"
 itertools = "0.12.1"
 log = "0.4.21"
 openssl = { version = "0.10.63" }
@@ -36,3 +37,4 @@ tokio = { version = "1.36.0", features = ["macros", "full"] }
 clap = { version = "4.5.1", features = ["cargo"] }
 clap_complete = "4"
 clap_mangen = "0.2.20"
+gethostname = "0.4.3"

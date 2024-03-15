@@ -3,15 +3,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-use std::{
-    io,
-    net::{IpAddr, SocketAddr},
-};
+use std::{io, net::SocketAddr, env, sync::OnceLock};
 
 use dns_lookup::lookup_host;
-use futures::{future::join_all, stream, StreamExt};
+use futures::future::join_all;
 use itertools::Itertools;
-use rayon::prelude::*;
+use gethostname::gethostname;
 
 #[allow(unused)]
 use log::{debug, error, info, trace, warn};
@@ -19,93 +16,16 @@ use log::{debug, error, info, trace, warn};
 use crate::nix::get_requisites;
 
 mod cli;
+mod net;
+mod nix;
 
-mod nix {
+/// The initial time to wait on http 104, in milliseconds
+const SLIDE: u64 = 100;
 
-    use serde_json::{Result, Value};
-    use std::{
-        path::Path,
-        process::{Command, Stdio},
-        str::Lines,
-    };
+const DEFAULT_CACHE: &str = "cache.nixos.org";
 
-    pub fn get_requisites(host: &str) -> String {
-        let get_drv_path = Command::new("nix")
-            .current_dir(Path::new("/home/ces/org/src/git/afk-nixos"))
-            .env("NIXPKGS_ALLOW_INSECURE", "1")
-            .args([
-                "build",
-                "--impure",
-                "--quiet",
-                &format!(
-                    "./#nixosConfigurations.{}.config.system.build.toplevel",
-                    host
-                ),
-                "--dry-run",
-                "--json",
-                "--option",
-                "eval-cache",
-                "true",
-            ])
-            .output()
-            .unwrap();
-
-        let drv_path_json: Value =
-            serde_json::from_str(&String::from_utf8(get_drv_path.stdout).unwrap()).unwrap();
-        let drv_path = drv_path_json[0]["drvPath"].clone();
-
-        println!("drv_path: {}", &drv_path);
-
-        let get_drv_requisites = Command::new("nix-store")
-            .args(["--query", "--requisites", drv_path.as_str().unwrap()])
-            .stdout(Stdio::piped())
-            .spawn()
-            .unwrap();
-        let drv_requisites_remove_base = Command::new("cut")
-            .args(["-d", "/", "-f4"])
-            .stdin(Stdio::from(get_drv_requisites.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()
-            .unwrap();
-        let drv_requisites_to_hash = Command::new("cut")
-            .args(["-d", "-", "-f1"])
-            .stdin(Stdio::from(drv_requisites_remove_base.stdout.unwrap()))
-            .stdout(Stdio::piped())
-            .spawn()
-            .unwrap();
-
-        String::from_utf8(drv_requisites_to_hash.wait_with_output().unwrap().stdout).unwrap()
-    }
-}
-
-mod net {
-    use std::{net::SocketAddr, time::Duration};
-
-    use async_recursion::async_recursion;
-    use reqwest::{Client, ClientBuilder, StatusCode};
-    use tokio::time::sleep;
-
-    #[async_recursion]
-    pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) -> usize {
-        let response = client
-            .head(format!("https://{domain}/{hash}.narinfo"))
-            .send()
-            .await;
-
-        match response {
-            Ok(response) if response.status().as_u16() == 200 => 1,
-            Ok(response) if response.status().as_u16() == 404 => 0,
-            _ => {
-                // We're so fast now we get rate limited.
-                //
-                // Writng an actual sliding window seems kinda hard,
-                // so we do this instead.
-                sleep(Duration::from_millis(slide)).await;
-                nar_exists(client, domain, hash, slide * 2).await
-            }
-        }
-    }
-}
+const HOST_NAME: OnceLock<String> = OnceLock::new();
+const CACHE_URL: OnceLock<String> = OnceLock::new();
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
@@ -113,35 +33,62 @@ async fn main() -> io::Result<()> {
 
     let matches = cli::build_cli().get_matches();
 
-    let domain = "cache.nixos.org";
-    let ips: Vec<std::net::IpAddr> = lookup_host(domain).unwrap();
+    match matches
+        .get_one::<u8>("verbose")
+        .expect("Count's are defaulted")
+    {
+        0 => env::set_var("RUST_LOG", "error"),
+        1 => env::set_var("RUST_LOG", "warn"),
+        2 => env::set_var("RUST_LOG", "info"),
+        3 => env::set_var("RUST_LOG", "debug"),
+        4 => env::set_var("RUST_LOG", "trace"),
+        _ => {
+            trace!("More than four -v flags don't increase log level.");
+            env::set_var("RUST_LOG", "trace")
+        }
+    }
+
+    if let Some(name) = matches.get_one::<String>("name") {
+        HOST_NAME.get_or_init(|| name.to_owned());
+    }
+    else {
+        HOST_NAME.get_or_init(|| gethostname().into_string().unwrap());
+    }
+
+    if let Some(cache) = matches.get_one::<String>("cache") {
+        trace!("Got cache argument: {cache}");
+        CACHE_URL.get_or_init(|| cache.to_owned());
+    }
+    else {
+        trace!("No cache argument, using default: {}", DEFAULT_CACHE.to_string());
+        CACHE_URL.get_or_init(|| DEFAULT_CACHE.to_string());
+    }
+
+    let domain = CACHE_URL.get().unwrap().to_owned();
+    let ips: Vec<std::net::IpAddr> = lookup_host(&domain).unwrap();
 
     debug!("{:#?}", &ips);
 
     let domain_addr = SocketAddr::new(ips[0], 443);
 
     let client = reqwest::Client::builder()
-        .resolve(domain, domain_addr)
+        .resolve(&domain, domain_addr)
         .build()
         .unwrap();
 
-    let binding = get_requisites("DBCAC");
-    let connection_buffer = binding
+    let binding = get_requisites(HOST_NAME.get().unwrap());
+
+    let tasks = binding
         .lines()
         .map(|line| line.to_owned())
-        .collect::<Vec<_>>();
-
-    // FIXME make constant
-    let slide = 100;
-
-    // FIXME we take ten just for testing
-    let tasks = connection_buffer
+        .collect::<Vec<_>>()
         .into_iter()
         .map(|hash| {
             let client = client.clone();
+            let domain = domain.clone();
             tokio::spawn(async move {
                 info!("connecting to {domain} {domain_addr:#?} for {hash}");
-                net::nar_exists(client, domain, &hash, slide).await
+                net::nar_exists(client, &domain, &hash, SLIDE).await
             })
         })
         .collect_vec();

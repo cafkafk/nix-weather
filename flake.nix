@@ -121,7 +121,7 @@
         # For `nix develop`:
         devShells.default = pkgs.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
-          inputsFrom = [ self.packages.${system}.default];
+          inputsFrom = [self.packages.${system}.default];
           nativeBuildInputs = with pkgs; [rustup toolchain just zip reuse];
         };
 

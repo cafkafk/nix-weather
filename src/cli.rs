@@ -3,36 +3,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-use clap::{arg, command, crate_authors, Arg, Command};
+use std::{cell::OnceCell, sync::OnceLock};
+
+use clap::{arg, command, crate_authors, value_parser, Arg, Command};
+
+const DEFAULT_CACHE: &str = "cache.nixos.org";
 
 pub fn build_cli() -> Command {
+    use std::path::PathBuf;
+
     command!()
         .author(crate_authors!("\n"))
         .arg(
-            Arg::new("all")
-                .short('a')
-                .long("all")
-                .help("Shows all fortunes, including unkind."),
+            arg!(--cache <CACHE> "check a specific cache")
+                .required(false)
+                .default_value(DEFAULT_CACHE),
         )
         .arg(
-            Arg::new("unkind")
-                .short('o')
-                .short('u')
-                .long("unkind")
-                .help("Shows only unkind fortunes."),
+            arg!(-n --name <HOST> "Hostname of machine.")
+                .required(false)
+                .value_parser(value_parser!(String)),
         )
         .arg(
-            Arg::new("find")
-                .short('m')
-                .long("find")
-                .value_name("pattern")
-                .help("Finds fortunes matching regex query."),
+            arg!(-c --config <FILE> "Path to NixOS config.")
+                .required(false)
+                .value_parser(value_parser!(PathBuf)),
         )
-        .arg(
-            Arg::new("length")
-                .short('n')
-                .long("length")
-                .help("Finds a fortune that is shorter than provided number."),
-        )
-        .arg(arg!(-s --short ... "Shows a short aporism."))
+        .arg(arg!(-v --verbose ... "Verbosity level."))
 }
