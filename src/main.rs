@@ -3,12 +3,15 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-use std::{io, net::{IpAddr, SocketAddr}};
+use std::{
+    io,
+    net::{IpAddr, SocketAddr},
+};
 
 use dns_lookup::lookup_host;
-use futures::{stream, StreamExt, future::join_all};
-use rayon::prelude::*;
+use futures::{future::join_all, stream, StreamExt};
 use itertools::Itertools;
+use rayon::prelude::*;
 
 #[allow(unused)]
 use log::{debug, error, info, trace, warn};
@@ -42,7 +45,7 @@ mod nix {
                 "--json",
                 "--option",
                 "eval-cache",
-                "true"
+                "true",
             ])
             .output()
             .unwrap();
@@ -78,8 +81,8 @@ mod nix {
 mod net {
     use std::{net::SocketAddr, time::Duration};
 
-    use reqwest::{StatusCode, ClientBuilder, Client};
     use async_recursion::async_recursion;
+    use reqwest::{Client, ClientBuilder, StatusCode};
     use tokio::time::sleep;
 
     #[async_recursion]
@@ -117,10 +120,16 @@ async fn main() -> io::Result<()> {
 
     let domain_addr = SocketAddr::new(ips[0], 443);
 
-    let client = reqwest::Client::builder().resolve(domain, domain_addr).build().unwrap();
+    let client = reqwest::Client::builder()
+        .resolve(domain, domain_addr)
+        .build()
+        .unwrap();
 
     let binding = get_requisites("DBCAC");
-    let connection_buffer = binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>();
+    let connection_buffer = binding
+        .lines()
+        .map(|line| line.to_owned())
+        .collect::<Vec<_>>();
 
     // FIXME make constant
     let slide = 100;
@@ -137,7 +146,11 @@ async fn main() -> io::Result<()> {
         })
         .collect_vec();
 
-    let sum: usize = join_all(tasks).await.into_iter().map(|result| result.unwrap()).sum();
+    let sum: usize = join_all(tasks)
+        .await
+        .into_iter()
+        .map(|result| result.unwrap())
+        .sum();
 
     println!("sum {:#?}", sum);
 
