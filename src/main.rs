@@ -40,12 +40,13 @@ mod nix {
                 ),
                 "--dry-run",
                 "--json",
+                "--option",
+                "eval-cache",
+                "true"
             ])
             .output()
             .unwrap();
 
-        // println!("{:#?}", &get_drv_path.stdout);
-        // let res: Value = serde_json::from_str(&String::from_utf8(output.stdout).unwrap()).unwrap();
         let drv_path_json: Value =
             serde_json::from_str(&String::from_utf8(get_drv_path.stdout).unwrap()).unwrap();
         let drv_path = drv_path_json[0]["drvPath"].clone();
@@ -55,7 +56,6 @@ mod nix {
         let get_drv_requisites = Command::new("nix-store")
             .args(["--query", "--requisites", drv_path.as_str().unwrap()])
             .stdout(Stdio::piped())
-            //.output()
             .spawn()
             .unwrap();
         let drv_requisites_remove_base = Command::new("cut")
@@ -71,19 +71,7 @@ mod nix {
             .spawn()
             .unwrap();
 
-        //println!("{:#?}", drv_requisites_to_hash.wait_with_output);
-
         String::from_utf8(drv_requisites_to_hash.wait_with_output().unwrap().stdout).unwrap()
-
-        // for hash in lines {
-        //     println!("{hash}");
-        // }
-        // println!("{:#?}", get_drv_requisites.stderr);
-
-        // println!(
-        //     "{:#?}",
-        //     String::from_utf8(get_drv_requisites.stdout).unwrap()
-        // );
     }
 }
 
@@ -113,28 +101,13 @@ mod net {
                 nar_exists(client, domain, hash, slide * 2).await
             }
         }
-
-        // match response.status().as_u16() {
-        //     200 => 1,
-        //     // Retry on ConnectionReset
-        //     104 => {
-        //         // We're so fast now we get rate limited.
-        //         //
-        //         // Writng an actual sliding window seems kinda hard,
-        //         // so we do this instead.
-        //         sleep(Duration::from_millis(slide)).await;
-        //         nar_exists(client, domain, hash, slide * 2).await
-        //     },
-        //     _ => 0
-        // }
     }
 }
 
-// #[tokio::main(flavor = "multi_thread", worker_threads = 100)]
-// #[tokio::main(flavor = "multi_thread", worker_threads = 500)]
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
     pretty_env_logger::init();
+
     let matches = cli::build_cli().get_matches();
 
     let domain = "cache.nixos.org";
@@ -155,7 +128,6 @@ async fn main() -> io::Result<()> {
     // FIXME we take ten just for testing
     let tasks = connection_buffer
         .into_iter()
-        //.take(1000)
         .map(|hash| {
             let client = client.clone();
             tokio::spawn(async move {
@@ -168,18 +140,6 @@ async fn main() -> io::Result<()> {
     let sum: usize = join_all(tasks).await.into_iter().map(|result| result.unwrap()).sum();
 
     println!("sum {:#?}", sum);
-        //map(|hash| async {net::nar_exists(hostname, SocketAddr::new(ip.clone(), 443), hash).await}).collect::<Vec<_>>();
-
-    // let response = reqwest::Client::builder()
-    //     .resolve(
-    //         url,
-    //         SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), 443),
-    //     )
-    //     .build()
-    //     .unwrap()
-    //     .get(url)
-    //     .send()
-    //     .await?;
 
     Ok(())
 }
