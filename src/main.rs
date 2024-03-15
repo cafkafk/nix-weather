@@ -90,15 +90,12 @@ mod nix {
 mod net {
     use std::net::SocketAddr;
 
-    use reqwest::StatusCode;
+    use reqwest::{StatusCode, ClientBuilder, Client};
     use async_recursion::async_recursion;
 
     #[async_recursion]
-    pub async fn nar_exists(domain: &str, domain_addr: SocketAddr, hash: &str) -> usize {
-        let response = reqwest::Client::builder()
-            .resolve(domain, domain_addr)
-            .build()
-            .unwrap()
+    pub async fn nar_exists(client: Client, domain: &str, hash: &str) -> usize {
+        let response = client
             .get(format!("https://{domain}/{hash}.narinfo"))
             .send()
             .await
@@ -107,27 +104,27 @@ mod net {
         match response.status().as_u16() {
             200 => 1,
             // Retry on ConnectionReset
-            104 => nar_exists(domain, domain_addr, hash).await,
+            104 => nar_exists(client, domain, hash).await,
             _ => 0
         }
     }
 }
 
 // #[tokio::main(flavor = "multi_thread", worker_threads = 100)]
+// #[tokio::main(flavor = "multi_thread", worker_threads = 500)]
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
     pretty_env_logger::init();
     let matches = cli::build_cli().get_matches();
 
-    let hostname = "cache.nixos.org";
-    let ips: Vec<std::net::IpAddr> = lookup_host(hostname).unwrap();
+    let domain = "cache.nixos.org";
+    let ips: Vec<std::net::IpAddr> = lookup_host(domain).unwrap();
 
     debug!("{:#?}", &ips);
 
-    let ip = ips[0];
+    let domain_addr = SocketAddr::new(ips[0], 443);
 
-    //let connection_buffer = stream::iter(binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>()); //.buffer_unordered(20);
-    //let connection_buffer = stream::iter(binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>()); //.buffer_unordered(20);
+    let client = reqwest::Client::builder().resolve(domain, domain_addr).build().unwrap();
 
     let binding = get_requisites("DBCAC");
     let connection_buffer = binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>();
@@ -137,9 +134,10 @@ async fn main() -> io::Result<()> {
         .into_iter()
         //.take(1000)
         .map(|hash| {
+            let client = client.clone();
             tokio::spawn(async move {
-                info!("connecting to {hostname} {ip:#?} for {hash}");
-                net::nar_exists(hostname, SocketAddr::new(ip.clone(), 443), &hash).await
+                info!("connecting to {domain} {domain_addr:#?} for {hash}");
+                net::nar_exists(client, domain, &hash).await
             })
         })
         .collect_vec();
