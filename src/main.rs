@@ -6,8 +6,9 @@
 use std::{io, net::{IpAddr, SocketAddr}};
 
 use dns_lookup::lookup_host;
-use futures::{stream, StreamExt};
+use futures::{stream, StreamExt, future::join_all};
 use rayon::prelude::*;
+use itertools::Itertools;
 
 #[allow(unused)]
 use log::{debug, error, info, trace, warn};
@@ -90,7 +91,9 @@ mod net {
     use std::net::SocketAddr;
 
     use reqwest::StatusCode;
+    use async_recursion::async_recursion;
 
+    #[async_recursion]
     pub async fn nar_exists(domain: &str, domain_addr: SocketAddr, hash: &str) -> usize {
         let response = reqwest::Client::builder()
             .resolve(domain, domain_addr)
@@ -100,16 +103,18 @@ mod net {
             .send()
             .await
             .unwrap();
-        if response.status() == StatusCode::from_u16(200).unwrap() {
-            1
-        }
-        else {
-            0
+
+        match response.status().as_u16() {
+            200 => 1,
+            // Retry on ConnectionReset
+            104 => nar_exists(domain, domain_addr, hash).await,
+            _ => 0
         }
     }
 }
 
-#[tokio::main]
+// #[tokio::main(flavor = "multi_thread", worker_threads = 100)]
+#[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
     pretty_env_logger::init();
     let matches = cli::build_cli().get_matches();
@@ -121,16 +126,28 @@ async fn main() -> io::Result<()> {
 
     let ip = ips[0];
 
-    let binding = get_requisites("DBCAC");
     //let connection_buffer = stream::iter(binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>()); //.buffer_unordered(20);
-    let connection_buffer = stream::iter(binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>()); //.buffer_unordered(20);
+    //let connection_buffer = stream::iter(binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>()); //.buffer_unordered(20);
+
+    let binding = get_requisites("DBCAC");
+    let connection_buffer = binding.lines().map(|line| line.to_owned()).collect::<Vec<_>>();
+
     // FIXME we take ten just for testing
-    let stuff = connection_buffer.take(1000).then(|hash| async move {
-        info!("connecting to {hostname} {ip:#?} for {hash}");
-        net::nar_exists(hostname, SocketAddr::new(ip.clone(), 443), &hash).await
-    }).collect::<Vec<usize>>();
+    let tasks = connection_buffer
+        .into_iter()
+        //.take(1000)
+        .map(|hash| {
+            tokio::spawn(async move {
+                info!("connecting to {hostname} {ip:#?} for {hash}");
+                net::nar_exists(hostname, SocketAddr::new(ip.clone(), 443), &hash).await
+            })
+        })
+        .collect_vec();
+
+    let sum: usize = join_all(tasks).await.into_iter().map(|result| result.unwrap()).sum();
+
+    println!("sum {:#?}", sum);
         //map(|hash| async {net::nar_exists(hostname, SocketAddr::new(ip.clone(), 443), hash).await}).collect::<Vec<_>>();
-    println!("sum {:#?}", stuff.await.par_iter().sum::<usize>());
 
     // let response = reqwest::Client::builder()
     //     .resolve(

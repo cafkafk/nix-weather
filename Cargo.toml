@@ -16,10 +16,12 @@ version = "0.0.1"
 build = "build.rs"
 
 [dependencies]
+async-recursion = "1.0.5"
 clap = { version = "4.5.1", features = ["cargo"] }
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
 futures = "0.3.30"
+itertools = "0.12.1"
 log = "0.4.21"
 openssl = { version = "0.10.63" }
 pretty_env_logger = "0.5.0"
