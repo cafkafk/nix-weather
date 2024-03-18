@@ -3,12 +3,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-use std::{io, net::SocketAddr, env, sync::OnceLock};
+use std::{env, io, net::SocketAddr};
 
 use dns_lookup::lookup_host;
 use futures::future::join_all;
-use itertools::Itertools;
 use gethostname::gethostname;
+use itertools::Itertools;
 
 #[allow(unused)]
 use log::{debug, error, info, trace, warn};
@@ -24,15 +24,17 @@ const SLIDE: u64 = 100;
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
 
-const HOST_NAME: OnceLock<String> = OnceLock::new();
-const CACHE_URL: OnceLock<String> = OnceLock::new();
-
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
+    console_subscriber::init();
+    let host_name: String;
+    let cache_url: String;
+
     pretty_env_logger::init();
 
     let matches = cli::build_cli().get_matches();
 
+    // TODO
     match matches
         .get_one::<u8>("verbose")
         .expect("Count's are defaulted")
@@ -49,22 +51,18 @@ async fn main() -> io::Result<()> {
     }
 
     if let Some(name) = matches.get_one::<String>("name") {
-        HOST_NAME.get_or_init(|| name.to_owned());
-    }
-    else {
-        HOST_NAME.get_or_init(|| gethostname().into_string().unwrap());
+        host_name = name.to_owned();
+    } else {
+        host_name = gethostname().into_string().unwrap();
     }
 
     if let Some(cache) = matches.get_one::<String>("cache") {
-        trace!("Got cache argument: {cache}");
-        CACHE_URL.get_or_init(|| cache.to_owned());
-    }
-    else {
-        trace!("No cache argument, using default: {}", DEFAULT_CACHE.to_string());
-        CACHE_URL.get_or_init(|| DEFAULT_CACHE.to_string());
+        cache_url = cache.to_owned();
+    } else {
+        cache_url = DEFAULT_CACHE.to_string();
     }
 
-    let domain = CACHE_URL.get().unwrap().to_owned();
+    let domain = cache_url.to_owned();
     let ips: Vec<std::net::IpAddr> = lookup_host(&domain).unwrap();
 
     debug!("{:#?}", &ips);
@@ -76,7 +74,7 @@ async fn main() -> io::Result<()> {
         .build()
         .unwrap();
 
-    let binding = get_requisites(HOST_NAME.get().unwrap());
+    let binding = get_requisites(&host_name);
 
     let tasks = binding
         .lines()

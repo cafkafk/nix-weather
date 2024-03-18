@@ -18,6 +18,7 @@ build = "build.rs"
 [dependencies]
 async-recursion = "1.0.5"
 clap = { version = "4.5.1", features = ["cargo"] }
+console-subscriber = "0.2.0"
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
 futures = "0.3.30"

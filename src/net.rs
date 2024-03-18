@@ -19,6 +19,7 @@ pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) ->
             //
             // Writng an actual sliding window seems kinda hard,
             // so we do this instead.
+            println!("blablabllb");
             sleep(Duration::from_millis(slide)).await;
             nar_exists(client, domain, hash, slide * 2).await
         }
