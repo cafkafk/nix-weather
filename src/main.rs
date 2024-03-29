@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 use std::{env, io, net::SocketAddr};
+use std::time::{Duration, Instant};
 
 use dns_lookup::lookup_host;
 use futures::future::join_all;
@@ -26,6 +27,8 @@ const DEFAULT_CACHE: &str = "cache.nixos.org";
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
+    let initial_time = Instant::now();
+
     let host_name: String;
     let cache_url: String;
 
@@ -75,6 +78,10 @@ async fn main() -> io::Result<()> {
 
     let binding = get_requisites(&host_name);
 
+    let get_requisites_duration = initial_time.elapsed().as_secs();
+
+    let network_time = Instant::now();
+
     let lines = binding
         .lines()
         .map(|line| line.to_owned())
@@ -100,7 +107,10 @@ async fn main() -> io::Result<()> {
         .map(|result| result.unwrap())
         .sum();
 
-    println!("sum {:#?}/{}", sum, count);
+    println!("Found Nix Requisites in {} seconds", get_requisites_duration);
+    println!("Checked {count} packages in {} seconds", network_time.elapsed().as_secs());
+    println!("");
+    println!("Found {:#?}/{} ({:.2}%) in cache", sum, count, (sum as f64 /count as f64) * 100.);
 
     Ok(())
 }
