@@ -5,7 +5,7 @@
 
 use std::{cell::OnceCell, sync::OnceLock};
 
-use clap::{arg, command, crate_authors, value_parser, Arg, Command};
+use clap::{arg, command, crate_authors, value_parser, Arg, ArgAction, Command};
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
 
@@ -28,6 +28,11 @@ pub fn build_cli() -> Command {
             arg!(-c --config <FILE> "Path to NixOS config.")
                 .required(false)
                 .value_parser(value_parser!(PathBuf)),
+        )
+        .arg(
+            arg!(--timestamp "Add timestamp to log output.")
+                .action(ArgAction::SetTrue)
+                .required(false),
         )
         .arg(arg!(-v --verbose ... "Verbosity level."))
 }

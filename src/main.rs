@@ -51,9 +51,15 @@ async fn main() -> io::Result<()> {
     }
 
     //pretty_env_logger::init();
-    pretty_env_logger::formatted_timed_builder()
-        .parse_env("RUST_LOG")
-        .init();
+    if matches.get_flag("timestamp") {
+        pretty_env_logger::formatted_timed_builder()
+            .parse_env("RUST_LOG")
+            .init();
+    } else {
+        pretty_env_logger::formatted_builder()
+            .parse_env("RUST_LOG")
+            .init();
+    }
 
     if let Some(name) = matches.get_one::<String>("name") {
         host_name = name.to_owned();
