@@ -26,7 +26,6 @@ const DEFAULT_CACHE: &str = "cache.nixos.org";
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
-    console_subscriber::init();
     let host_name: String;
     let cache_url: String;
 
@@ -76,10 +75,14 @@ async fn main() -> io::Result<()> {
 
     let binding = get_requisites(&host_name);
 
-    let tasks = binding
+    let lines = binding
         .lines()
         .map(|line| line.to_owned())
-        .collect::<Vec<_>>()
+        .collect::<Vec<_>>();
+
+    let count = lines.len();
+
+    let tasks = lines
         .into_iter()
         .map(|hash| {
             let client = client.clone();
@@ -97,7 +100,7 @@ async fn main() -> io::Result<()> {
         .map(|result| result.unwrap())
         .sum();
 
-    println!("sum {:#?}", sum);
+    println!("sum {:#?}/{}", sum, count);
 
     Ok(())
 }
