@@ -4,6 +4,9 @@ use async_recursion::async_recursion;
 use reqwest::Client;
 use tokio::time::sleep;
 
+#[allow(unused)]
+use log::{debug, error, info, trace, warn};
+
 const MAX_SLIDE: u64 = 1000;
 
 #[async_recursion]
@@ -21,6 +24,8 @@ pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) ->
             //
             // Writng an actual sliding window seems kinda hard,
             // so we do this instead.
+            trace!("rate limited! {slide}");
+            println!("");
             sleep(Duration::from_millis(slide)).await;
             nar_exists(client, domain, hash, std::cmp::min(slide * 2, MAX_SLIDE)).await
         }

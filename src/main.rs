@@ -3,8 +3,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-use std::{env, io, net::SocketAddr};
 use std::time::{Duration, Instant};
+use std::{env, io, net::SocketAddr};
 
 use dns_lookup::lookup_host;
 use futures::future::join_all;
@@ -32,8 +32,6 @@ async fn main() -> io::Result<()> {
     let host_name: String;
     let cache_url: String;
 
-    pretty_env_logger::init();
-
     let matches = cli::build_cli().get_matches();
 
     // TODO
@@ -51,6 +49,11 @@ async fn main() -> io::Result<()> {
             env::set_var("RUST_LOG", "trace")
         }
     }
+
+    //pretty_env_logger::init();
+    pretty_env_logger::formatted_timed_builder()
+        .parse_env("RUST_LOG")
+        .init();
 
     if let Some(name) = matches.get_one::<String>("name") {
         host_name = name.to_owned();
@@ -80,6 +83,11 @@ async fn main() -> io::Result<()> {
 
     let get_requisites_duration = initial_time.elapsed().as_secs();
 
+    println!(
+        "Found Nix Requisites in {} seconds",
+        get_requisites_duration
+    );
+
     let network_time = Instant::now();
 
     let lines = binding
@@ -107,10 +115,17 @@ async fn main() -> io::Result<()> {
         .map(|result| result.unwrap())
         .sum();
 
-    println!("Found Nix Requisites in {} seconds", get_requisites_duration);
-    println!("Checked {count} packages in {} seconds", network_time.elapsed().as_secs());
+    println!(
+        "Checked {count} packages in {} seconds",
+        network_time.elapsed().as_secs()
+    );
     println!("");
-    println!("Found {:#?}/{} ({:.2}%) in cache", sum, count, (sum as f64 /count as f64) * 100.);
+    println!(
+        "Found {:#?}/{} ({:.2}%) in cache",
+        sum,
+        count,
+        (sum as f64 / count as f64) * 100.
+    );
 
     Ok(())
 }
