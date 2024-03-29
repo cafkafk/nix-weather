@@ -4,10 +4,10 @@ use std::{
     process::{Command, Stdio},
 };
 
-pub fn get_requisites(host: &str) -> String {
+pub fn get_requisites(host: &str, config_dir: &str) -> String {
     let get_drv_path = Command::new("nix")
-        .current_dir(Path::new("/home/ces/org/src/git/afk-nixos"))
-        .env("NIXPKGS_ALLOW_INSECURE", "1")
+        .current_dir(Path::new(config_dir))
+        .env("NIXPKGS_ALLOW_INSECURE", "1") // FIXME Idk but fix it
         .args([
             "build",
             "--impure",

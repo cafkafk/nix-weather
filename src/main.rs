@@ -24,6 +24,7 @@ mod nix;
 const SLIDE: u64 = 100;
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
+const DEFAULT_CONFIG_DIR: &str = "/etc/nixos";
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> io::Result<()> {
@@ -31,6 +32,7 @@ async fn main() -> io::Result<()> {
 
     let host_name: String;
     let cache_url: String;
+    let config_dir: String;
 
     let matches = cli::build_cli().get_matches();
 
@@ -50,7 +52,6 @@ async fn main() -> io::Result<()> {
         }
     }
 
-    //pretty_env_logger::init();
     if matches.get_flag("timestamp") {
         pretty_env_logger::formatted_timed_builder()
             .parse_env("RUST_LOG")
@@ -73,6 +74,12 @@ async fn main() -> io::Result<()> {
         cache_url = DEFAULT_CACHE.to_string();
     }
 
+    if let Some(config) = matches.get_one::<String>("config") {
+        config_dir = config.to_owned();
+    } else {
+        config_dir = DEFAULT_CONFIG_DIR.to_string();
+    }
+
     let domain = cache_url.to_owned();
     let ips: Vec<std::net::IpAddr> = lookup_host(&domain).unwrap();
 
@@ -85,7 +92,7 @@ async fn main() -> io::Result<()> {
         .build()
         .unwrap();
 
-    let binding = get_requisites(&host_name);
+    let binding = get_requisites(&host_name, &config_dir);
 
     let get_requisites_duration = initial_time.elapsed().as_secs();
 

@@ -27,7 +27,7 @@ pub fn build_cli() -> Command {
         .arg(
             arg!(-c --config <FILE> "Path to NixOS config.")
                 .required(false)
-                .value_parser(value_parser!(PathBuf)),
+                .value_parser(value_parser!(String)),
         )
         .arg(
             arg!(--timestamp "Add timestamp to log output.")
