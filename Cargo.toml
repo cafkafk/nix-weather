@@ -16,7 +16,7 @@ version = "0.0.1"
 build = "build.rs"
 
 [dependencies]
-async-recursion = "1.0.5"
+async-recursion = "1.1.1"
 clap = { version = "4.5.1", features = ["cargo"] }
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
