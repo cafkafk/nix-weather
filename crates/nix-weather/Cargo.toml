@@ -16,7 +16,7 @@ publish = false
 build = "build.rs"
 
 [dependencies]
-clap = { version = "4.5.1", features = ["cargo"] }
+clap = { version = "4.5.177", features = ["cargo"] }
 console-subscriber = "0.2.0"
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
@@ -35,7 +35,7 @@ tokio = { version = "1.36.0", features = ["macros", "full"] }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [build-dependencies]
-clap = { version = "4.5.1", features = ["cargo"] }
+clap = { version = "4.5.177", features = ["cargo"] }
 clap_complete = "4"
 clap_mangen = "0.2.20"
 gethostname = "0.4.3"
