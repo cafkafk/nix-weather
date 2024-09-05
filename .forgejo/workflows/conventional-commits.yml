@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build:
     name: Conventional Commits
-    runs-on: ubuntu-latest
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
       - uses: webiny/action-conventional-commits@v1.3.0

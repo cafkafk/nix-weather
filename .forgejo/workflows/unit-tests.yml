@@ -26,11 +26,11 @@ env:
   RUSTFLAGS: --deny warnings
 jobs:
   unit-tests:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matxrix.os }}
     continue-on-error: ${{ matrix.rust == 'nightly' }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [native]
         rust: [1.70.0, stable, beta, nightly]
     steps:
       - name: Checkout repository

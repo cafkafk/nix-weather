@@ -30,14 +30,14 @@ concurrency:
 jobs:
   flake-checker:
     name: Flake Checker
-    runs-on: ubuntu-22.04
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
       - name: Check Nix flake inputs
         uses: DeterminateSystems/flake-checker-action@v8
   check:
     name: Check Nix Flake
-    runs-on: ubuntu-22.04
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix
@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         target: [x86_64-linux]
-    runs-on: ubuntu-22.04
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
       - name: Install Nix

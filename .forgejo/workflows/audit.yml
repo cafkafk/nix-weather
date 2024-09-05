@@ -14,7 +14,7 @@ on:
       - 'deny.toml'
 jobs:
   security_audit:
-    runs-on: ubuntu-latest
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
       - uses: taiki-e/install-action@cargo-deny
