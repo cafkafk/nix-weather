@@ -11,8 +11,7 @@ use futures::future::join_all;
 use gethostname::gethostname;
 use itertools::Itertools;
 
-#[allow(unused)]
-use log::{debug, error, info, trace, warn};
+use log;
 
 use crate::nix::get_requisites;
 
@@ -47,7 +46,7 @@ async fn main() -> io::Result<()> {
         3 => env::set_var("RUST_LOG", "debug"),
         4 => env::set_var("RUST_LOG", "trace"),
         _ => {
-            trace!("More than four -v flags don't increase log level.");
+            log::trace!("More than four -v flags don't increase log level.");
             env::set_var("RUST_LOG", "trace")
         }
     }
@@ -83,7 +82,7 @@ async fn main() -> io::Result<()> {
     let domain = cache_url.to_owned();
     let ips: Vec<std::net::IpAddr> = lookup_host(&domain).unwrap();
 
-    debug!("{:#?}", &ips);
+    log::debug!("{:#?}", &ips);
 
     let domain_addr = SocketAddr::new(ips[0], 443);
 
@@ -116,7 +115,7 @@ async fn main() -> io::Result<()> {
             let client = client.clone();
             let domain = domain.clone();
             tokio::spawn(async move {
-                info!("connecting to {domain} {domain_addr:#?} for {hash}");
+                log::info!("connecting to {domain} {domain_addr:#?} for {hash}");
                 net::nar_exists(client, &domain, &hash, SLIDE).await
             })
         })
