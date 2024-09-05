@@ -33,7 +33,7 @@ pub fn get_requisites(host: &str, config_dir: &str) -> String {
         serde_json::from_str(&String::from_utf8(get_drv_path.stdout).unwrap()).unwrap();
     let drv_path = drv_path_json[0]["drvPath"].clone();
 
-    println!("drv_path: {}", &drv_path);
+    log::debug!("drv_path: {}", &drv_path);
 
     let get_drv_requisites = Command::new("nix-store")
         .args(["--query", "--requisites", drv_path.as_str().unwrap()])

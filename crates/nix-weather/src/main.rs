@@ -115,7 +115,7 @@ async fn main() -> io::Result<()> {
             let client = client.clone();
             let domain = domain.clone();
             tokio::spawn(async move {
-                log::info!("connecting to {domain} {domain_addr:#?} for {hash}");
+                log::trace!("connecting to {domain} {domain_addr:#?} for {hash}");
                 net::nar_exists(client, &domain, &hash, SLIDE).await
             })
         })
@@ -131,7 +131,6 @@ async fn main() -> io::Result<()> {
         "Checked {count} packages in {} seconds",
         network_time.elapsed().as_secs()
     );
-    println!("");
     println!(
         "Found {:#?}/{} ({:.2}%) in cache",
         sum,
