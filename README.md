@@ -5,6 +5,7 @@ SPDX-FileContributor: Christina Sørensen
 SPDX-License-Identifier: EUPL-1.2
 -->
 
+<div style="padding-left: 15%;padding-right: 15%;">
 <div align="center">
 
 # Weather - Check Cache Availablility of NixOS Configurations
@@ -21,7 +22,6 @@ weather`](https://guix.gnu.org/manual/en/html_node/Invoking-guix-weather.html).
 
 </div>
 
-<div style="padding: 15%">
 
 ## Usage
 
