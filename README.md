@@ -21,6 +21,8 @@ weather`](https://guix.gnu.org/manual/en/html_node/Invoking-guix-weather.html).
 
 </div>
 
+<div style="padding: 15%">
+
 ## Usage
 
 > **Note** 
@@ -48,3 +50,5 @@ One of the biggest limiting factors regarding speed is building the
 Caching the requisites is a future goal, so that we only have to build the
 `toplevel`, and then match against its derivation in cache, which should cut
 down the nix part of the runtime by ~80%.
+
+</div>
