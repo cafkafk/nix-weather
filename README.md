@@ -8,7 +8,7 @@ SPDX-License-Identifier: EUPL-1.2
 <div style="padding-left: 15%;padding-right: 15%;">
 <div align="center">
 
-# Weather - Check Cache Availablility of NixOS Configurations
+# Nix Weather - Check Cache Availablility of NixOS Configurations
 
 A *fast* rust tool to check availability of your entire system in caches. It so
 to speak "checks the weather" before going to update. Heavily inspired by [`guix
