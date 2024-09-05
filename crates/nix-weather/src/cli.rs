@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: 2023 Christina Sørensen
+// SPDX-FileCopyrightText: 2023-2024 Christina Sørensen
 // SPDX-FileContributor: Christina Sørensen
 //
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: EUPL-1.2
 
 use std::{cell::OnceCell, sync::OnceLock};
 

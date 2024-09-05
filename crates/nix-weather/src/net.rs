@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2024 Christina Sørensen
+// SPDX-FileContributor: Christina Sørensen
+//
+// SPDX-License-Identifier: EUPL-1.2
+
 use std::time::Duration;
 
 use async_recursion::async_recursion;
