@@ -20,3 +20,32 @@ weather`](https://guix.gnu.org/manual/en/html_node/Invoking-guix-weather.html).
 [![License: EUPL-1.2](https://img.shields.io/badge/licence-EUPL--1.2-blue)](https://commission.europa.eu/content/european-union-public-licence_en)
 
 </div>
+
+## How It Works
+
+The basic idea is that we construct a set of all requisites to build the
+top-level of a NixOS configuration, and then query Nix cache(s) for the narinfo.
+By doing this in a high concurrency, parallel task runner (i.e. tokio async
+runtime), and only querying the headers for status codes, we can reach
+impressive speeds, typically around 45~ network time. 
+
+One of the biggest limiting factors regarding speed is building the
+`config.system.toplevel`, and finding the necessary requisites with `nix-store`.
+Caching the requisites is a future goal, so that we only have to build the
+`toplevel`, and then match against its derivation in cache, which should cut
+down the nix part of the runtime by ~80%.
+
+## Usage
+
+> **Note** 
+> Currently, `nix-weather` only has first-class support for flakes.
+
+General usage would be like this:
+
+```bash
+nix-weather --name myhost --config ~/git/my-nixos-config
+```
+
+Here, we specify the name of the host, as specified at the flake output
+`nixosConfiguration`, and a path to the NixOS configuration flake.
+
