@@ -21,7 +21,7 @@ console-subscriber = "0.2.0"
 dns-lookup = "2.0.4"
 domain = { version = "0.9.3", features = ["tokio", "resolv"] }
 futures = "0.3.30"
-gethostname = "0.4.3"
+gethostname = "0.5.0"
 itertools = "0.12.1"
 log = "0.4.21"
 openssl = { version = "0.10.63" }
@@ -38,4 +38,4 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 clap = { version = "4.5.1", features = ["cargo"] }
 clap_complete = "4"
 clap_mangen = "0.2.20"
-gethostname = "0.4.3"
+gethostname = "0.5.0"
