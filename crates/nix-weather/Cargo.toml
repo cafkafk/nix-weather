@@ -19,7 +19,7 @@ build = "build.rs"
 clap = { version = "4.5.1", features = ["cargo"] }
 console-subscriber = "0.2.0"
 dns-lookup = "2.0.4"
-domain = { version = "0.9.3", features = ["tokio", "resolv"] }
+domain = { version = "0.10.1", features = ["tokio", "resolv"] }
 futures = "0.3.30"
 gethostname = "0.4.3"
 itertools = "0.12.1"
