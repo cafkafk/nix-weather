@@ -35,10 +35,13 @@ async fn main() -> io::Result<()> {
 
     let matches = cli::build_cli().get_matches();
 
-    // TODO
+    /// If the users inputs more -v flags than we have log levels, send them a
+    /// message informing them.
+    let mut very_bose = false;
+
     match matches
         .get_one::<u8>("verbose")
-        .expect("Count's are defaulted")
+        .expect("Counts aren't defaulted")
     {
         0 => env::set_var("RUST_LOG", "error"),
         1 => env::set_var("RUST_LOG", "warn"),
@@ -46,7 +49,7 @@ async fn main() -> io::Result<()> {
         3 => env::set_var("RUST_LOG", "debug"),
         4 => env::set_var("RUST_LOG", "trace"),
         _ => {
-            log::trace!("More than four -v flags don't increase log level.");
+            very_bose = true;
             env::set_var("RUST_LOG", "trace")
         }
     }
@@ -59,6 +62,10 @@ async fn main() -> io::Result<()> {
         pretty_env_logger::formatted_builder()
             .parse_env("RUST_LOG")
             .init();
+    }
+
+    if very_bose {
+        log::trace!("More than four -v flags don't increase log level.");
     }
 
     if let Some(name) = matches.get_one::<String>("name") {
