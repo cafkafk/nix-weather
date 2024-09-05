@@ -5,7 +5,6 @@
 
 use std::time::Duration;
 
-use async_recursion::async_recursion;
 use reqwest::Client;
 use tokio::time::sleep;
 
@@ -13,7 +12,6 @@ use log;
 
 const MAX_SLIDE: u64 = 1000;
 
-#[async_recursion]
 pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) -> usize {
     let response = client
         .head(format!("https://{domain}/{hash}.narinfo"))
@@ -30,7 +28,13 @@ pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) ->
             // so we do this instead.
             log::trace!("rate limited! {slide}");
             sleep(Duration::from_millis(slide)).await;
-            nar_exists(client, domain, hash, std::cmp::min(slide * 2, MAX_SLIDE)).await
+            Box::pin(nar_exists(
+                client,
+                domain,
+                hash,
+                std::cmp::min(slide * 2, MAX_SLIDE),
+            ))
+            .await
         }
     }
 }
