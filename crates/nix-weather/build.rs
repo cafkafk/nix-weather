@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: 2023 Christina Sørensen
+// SPDX-FileCopyrightText: 2023-2024 Christina Sørensen
 // SPDX-FileContributor: Christina Sørensen
 //
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: EUPL-1.2
 
 use clap::ValueEnum;
 use clap_complete::{generate_to, Shell};
@@ -26,6 +26,9 @@ fn main() -> Result<(), Error> {
 
     let mut cmd = build_cli();
     for &shell in Shell::value_variants() {
+        // HACK: this is gross :(
+        let output = std::process::Command::new("mkdir").arg("man").output();
+
         generate_to(shell, &mut cmd, "nix-weather", &outdir)?;
     }
 

@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+version = 1
+SPDX-PackageName = "trial"
+SPDX-PackageSupplier = "Christina Sørensen <christina@cafkafk.com>"
+
+[[annotations]]
+path = "flake.lock"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Christina Sørensen"
+SPDX-License-Identifier = "EUPL-1.2"
+
+[[annotations]]
+path = "Cargo.lock"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Christina Sørensen"
+SPDX-License-Identifier = "EUPL-1.2"
+
+[[annotations]]
+path = ".envrc"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 Christina Sørensen"
+SPDX-License-Identifier = "EUPL-1.2"

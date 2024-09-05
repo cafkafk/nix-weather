@@ -1,7 +1,6 @@
-# SPDX-FileCopyrightText: 2023 Christina Sørensen
-# SPDX-FileContributor: Christina Sørensen
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
 #
-# SPDX-License-Identifier: AGPL-3.0-only
+# SPDX-License-Identifier: EUPL-1.2
 
 # Lines starting with a '#' are comments.
 # Each line is a file pattern followed by one or more owners.
@@ -27,5 +26,5 @@
 # *.js @js-owner
 # *.css @css-owner
 
-# All of it
+# All files for me :3
 * @cafkafk

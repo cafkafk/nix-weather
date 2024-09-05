@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+[package]
+name = "common"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[dependencies]
+workspace-hack = { version = "0.1", path = "../workspace-hack" }

@@ -1,10 +1,10 @@
-# SPDX-FileCopyrightText: 2023 Christina Sørensen
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
 # SPDX-FileContributor: Christina Sørensen
 #
-# SPDX-License-Identifier: AGPL-3.0-only
+# SPDX-License-Identifier: EUPL-1.2
 
 [toolchain]
-channel = "1.74"
+channel = "stable"
 components = [
   "rustfmt",
   "rustc",

@@ -1,10 +1,20 @@
-# SPDX-FileCopyrightText: 2023 Christina Sørensen
-# SPDX-FileContributor: Christina Sørensen
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
 #
-# SPDX-License-Identifier: AGPL-3.0-only
+# SPDX-License-Identifier: EUPL-1.2
 
+# Ignore output from latex locally
+*.aux
+*.log
+*.pdf
+
+# Rust
 /target
-/result
 
+# Nix
+result*
+
+# Direnv
 .direnv
+
+# pre-commit-hooks
 .pre-commit-config.yaml

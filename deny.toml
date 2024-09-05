@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+[bans]
+multiple-versions = 'allow'
+
+[licenses]
+private = { ignore = true }
+allow = ["MIT"]
