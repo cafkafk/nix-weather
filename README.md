@@ -52,3 +52,7 @@ Caching the requisites is a future goal, so that we only have to build the
 down the nix part of the runtime by ~80%.
 
 </div>
+
+## Contributing
+
+For information on contributing, please see [CONTRIBUTING.md](CONTRIBUTING.md).
