@@ -12,11 +12,12 @@ on:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
       - 'deny.toml'
+  pull_request:
+    branches: [main]
 jobs:
   security_audit:
-    runs-on: ubuntu-latest
+    runs-on: native
     steps:
       - uses: actions/checkout@v4
-      - uses: taiki-e/install-action@cargo-deny
       - name: Scan for vulnerabilities
-        run: cargo deny check
+        run: nix develop --accept-flake-config --command cargo deny check
