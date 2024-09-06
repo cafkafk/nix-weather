@@ -4,3 +4,6 @@
 
 update-deps:
   cargo hakari generate
+
+changelog:
+  git cliff -c .config/cliff.toml

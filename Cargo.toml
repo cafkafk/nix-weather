@@ -7,9 +7,13 @@ resolver = "2"
 members = ["crates/*", "crates/workspace-hack"]
 
 [workspace.package]
+description = "Guix weather, for nix!"
 version = "0.0.1"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.81"
+license = "EUPL-1.2"
+authors = ["Christina Sørensen <christina@cafkafk.com>"]
+categories = ["command-line-utilities"]
 
 [workspace.metadata.crane]
 name = "nix-weather"
