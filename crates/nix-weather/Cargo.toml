@@ -5,14 +5,14 @@
 
 [package]
 name = "nix-weather"
-description = "Guix weather, for nix!"
-authors = ["Christina Sørensen <christina@cafkafk.com>"]
-categories = ["command-line-utilities"]
-rust-version = "1.80.1"
-license = "EUPL-1.2"
+description.workspace = true
+authors.workspace = true
+categories.workspace = true
+license.workspace = true
+rust-version.workspace = true
 version.workspace = true
 edition.workspace = true
-publish = false
+publish = true
 build = "build.rs"
 
 [dependencies]
