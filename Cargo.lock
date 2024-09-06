@@ -304,7 +304,7 @@ checksum = "d3fd119d74b830634cea2a0f58bbd0d54540518a14397557951e79340abc28c0"
 
 [[package]]
 name = "common"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "workspace-hack",
 ]
@@ -1109,7 +1109,7 @@ checksum = "650eef8c711430f1a879fdd01d4745a7deea475becfb90269c06775983bbf086"
 
 [[package]]
 name = "nix-weather"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "clap",
  "clap_complete",
