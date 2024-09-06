@@ -7,11 +7,7 @@ on:
   schedule:
     - cron: '0 0 * * *'
   push:
-    paths:
-      - '.github/workflows/audit.yml'
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
-      - 'deny.toml'
+    branches: [main]
   pull_request:
     branches: [main]
 jobs:
