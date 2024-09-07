@@ -14,30 +14,33 @@ use std::path::PathBuf;
 include!("src/cli.rs");
 
 fn main() -> Result<(), Error> {
-    let real_outdir = match env::var_os("OUT_DIR") {
-        None => return Ok(()),
-        Some(outdir) => outdir,
-    };
+  let real_outdir = match env::var_os("OUT_DIR") {
+    None => return Ok(()),
+    Some(outdir) => outdir,
+  };
 
-    let outdir = match env::var_os("MAN_OUT") {
-        None => real_outdir,
-        Some(outdir) => outdir,
-    };
+  let outdir = match env::var_os("MAN_OUT") {
+    None => real_outdir,
+    Some(outdir) => outdir,
+  };
 
-    let mut cmd = build_cli();
-    for &shell in Shell::value_variants() {
-        // HACK: this is gross :(
-        let output = std::process::Command::new("mkdir").arg("man").output();
+  let mut cmd = build_cli();
+  for &shell in Shell::value_variants() {
+    // HACK: this is gross :(
+    std::process::Command::new("mkdir")
+      .arg("man")
+      .output()
+      .expect("failed to make man directory");
 
-        generate_to(shell, &mut cmd, "nix-weather", &outdir)?;
-    }
+    generate_to(shell, &mut cmd, "nix-weather", &outdir)?;
+  }
 
-    let file = PathBuf::from(&outdir).join("nix-weather.1");
-    let mut file = File::create(file)?;
+  let file = PathBuf::from(&outdir).join("nix-weather.1");
+  let mut file = File::create(file)?;
 
-    Man::new(cmd).render(&mut file)?;
+  Man::new(cmd).render(&mut file)?;
 
-    println!("cargo:warning=completion file is generated: {outdir:?}");
+  println!("cargo:warning=completion file is generated: {outdir:?}");
 
-    Ok(())
+  Ok(())
 }

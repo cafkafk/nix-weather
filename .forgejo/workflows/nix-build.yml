@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+name: build
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  run:
+    runs-on: native
+    steps:
+      - uses: actions/checkout@v4
+      - name: build flake
+        run: nix build

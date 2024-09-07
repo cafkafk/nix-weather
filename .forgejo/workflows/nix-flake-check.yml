@@ -2,18 +2,16 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-name: Security audit
+name: check
 on:
-  schedule:
-    - cron: '0 0 * * *'
   push:
     branches: [main]
   pull_request:
     branches: [main]
 jobs:
-  security_audit:
+  run:
     runs-on: native
     steps:
       - uses: actions/checkout@v4
-      - name: Scan for vulnerabilities
-        run: nix develop --accept-flake-config --command cargo deny check
+      - name: flake checks
+        run: nix flake check

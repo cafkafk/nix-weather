@@ -85,9 +85,7 @@
       let
         overlays = [ (import rust-overlay) ];
 
-        pkgs = (import nixpkgs) {
-          inherit system overlays;
-        };
+        pkgs = (import nixpkgs) { inherit system overlays; };
 
         inherit (pkgs) lib;
 
@@ -101,9 +99,7 @@
           inherit src;
           strictDeps = true;
 
-          nativeBuildInputs = [
-            pkgs.pkg-config
-          ];
+          nativeBuildInputs = [ pkgs.pkg-config ];
 
           buildInputs =
             [
@@ -205,27 +201,16 @@
             }
           );
 
-          cargo-workspace-doc = craneLib.cargoDoc (
-            commonArgs
-            // {
-              inherit cargoArtifacts;
-            }
-          );
+          cargo-workspace-doc = craneLib.cargoDoc (commonArgs // { inherit cargoArtifacts; });
 
           # Check formatting
-          cargo-workspace-fmt = craneLib.cargoFmt {
-            inherit src;
-          };
+          cargo-workspace-fmt = craneLib.cargoFmt { inherit src; };
 
           # Audit dependencies
-          cargo-workspace-audit = craneLib.cargoAudit {
-            inherit src advisory-db;
-          };
+          cargo-workspace-audit = craneLib.cargoAudit { inherit src advisory-db; };
 
           # Audit licenses
-          cargo-workspace-deny = craneLib.cargoDeny {
-            inherit src;
-          };
+          cargo-workspace-deny = craneLib.cargoDeny { inherit src; };
 
           # Run tests with cargo-nextest
           # Consider setting `doCheck = false` on other crate derivations
@@ -252,9 +237,7 @@
               cargo hakari verify
             '';
 
-            nativeBuildInputs = [
-              pkgs.cargo-hakari
-            ];
+            nativeBuildInputs = [ pkgs.cargo-hakari ];
           };
           pre-commit-check =
             let
@@ -268,7 +251,8 @@
             pre-commit-hooks.lib.${system}.run {
               src = ./.;
               hooks = treefmtFormatters // {
-                convco.enable = true; # not in treefmt
+                # not in treefmt
+                convco.enable = true;
                 reuse = {
                   enable = true;
                   name = "reuse";
@@ -287,17 +271,12 @@
           }
           // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
             cargo-workspace-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (
-              commonArgs
-              // {
-                inherit cargoArtifacts;
-              }
+              commonArgs // { inherit cargoArtifacts; }
             );
           };
 
         apps = {
-          nix-weather = flake-utils.lib.mkApp {
-            drv = nix-weather;
-          };
+          nix-weather = flake-utils.lib.mkApp { drv = nix-weather; };
         };
 
         # For `nix develop`:
@@ -332,16 +311,3 @@
     ];
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
