@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-name: Check Flake
+name: check flake
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -15,5 +15,5 @@ jobs:
     runs-on: native
     steps:
       - uses: actions/checkout@v4
-      - name: Run flake checks
+      - name: flake checks
         run: nix flake check

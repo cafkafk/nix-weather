@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
-    name: Conventional Commits
+    name: conventional commits
     runs-on: native
     steps:
       - uses: actions/checkout@v4
