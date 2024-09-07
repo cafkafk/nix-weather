@@ -5,7 +5,7 @@
 {
   projectRootFile = "Cargo.toml";
   programs = {
-    nixpkgs-fmt.enable = true; # nix
+    nixfmt-rfc-style.enable = true; # nix
     statix.enable = true; # nix static analysis
     deadnix.enable = true; # find dead nix code
     rustfmt.enable = true; # rust
