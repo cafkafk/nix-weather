@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-name: Conventional Commits
+name: conventional commits
 on:
   push:
     branches: [main]
@@ -12,7 +12,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
   cancel-in-progress: true
 jobs:
-  build:
+  check:
     name: conventional commits
     runs-on: native
     steps:

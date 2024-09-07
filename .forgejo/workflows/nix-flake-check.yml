@@ -2,16 +2,14 @@
 #
 # SPDX-License-Identifier: EUPL-1.2
 
-name: check flake
+name: check
 on:
-  schedule:
-    - cron: '0 0 * * *'
   push:
     branches: [main]
   pull_request:
     branches: [main]
 jobs:
-  security_audit:
+  run:
     runs-on: native
     steps:
       - uses: actions/checkout@v4
