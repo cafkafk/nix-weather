@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2024 Christina Sørensen
+#
+# SPDX-License-Identifier: EUPL-1.2
+
+name: Check Flake
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  security_audit:
+    runs-on: native
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run flake checks
+        run: nix flake check
