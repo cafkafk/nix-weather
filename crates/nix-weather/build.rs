@@ -27,7 +27,10 @@ fn main() -> Result<(), Error> {
   let mut cmd = build_cli();
   for &shell in Shell::value_variants() {
     // HACK: this is gross :(
-    let output = std::process::Command::new("mkdir").arg("man").output();
+    std::process::Command::new("mkdir")
+      .arg("man")
+      .output()
+      .expect("failed to make man directory");
 
     generate_to(shell, &mut cmd, "nix-weather", &outdir)?;
   }

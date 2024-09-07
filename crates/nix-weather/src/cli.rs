@@ -3,15 +3,11 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-use std::{cell::OnceCell, sync::OnceLock};
-
-use clap::{arg, command, crate_authors, value_parser, Arg, ArgAction, Command};
+use clap::{arg, command, crate_authors, value_parser, ArgAction, Command};
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
 
 pub fn build_cli() -> Command {
-  use std::path::PathBuf;
-
   command!()
     .author(crate_authors!("\n"))
     .arg(

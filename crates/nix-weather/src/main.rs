@@ -3,15 +3,13 @@
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use std::{env, io, net::SocketAddr};
 
 use dns_lookup::lookup_host;
 use futures::future::join_all;
 use gethostname::gethostname;
 use itertools::Itertools;
-
-use log;
 
 use crate::nix::get_requisites;
 
@@ -35,8 +33,8 @@ async fn main() -> io::Result<()> {
 
   let matches = cli::build_cli().get_matches();
 
-  /// If the users inputs more -v flags than we have log levels, send them a
-  /// message informing them.
+  // If the users inputs more -v flags than we have log levels, send them a
+  // message informing them.
   let mut very_bose = false;
 
   match matches

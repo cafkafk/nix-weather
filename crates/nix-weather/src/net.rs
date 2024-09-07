@@ -8,8 +8,6 @@ use std::time::Duration;
 use reqwest::Client;
 use tokio::time::sleep;
 
-use log;
-
 const MAX_SLIDE: u64 = 1000;
 
 pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) -> usize {
