@@ -10,10 +10,16 @@ members = ["crates/*", "crates/workspace-hack"]
 description = "Guix weather, for nix!"
 version = "0.0.2"
 edition = "2021"
-rust-version = "1.81"
 license = "EUPL-1.2"
 authors = ["Christina Sørensen <christina@cafkafk.com>"]
 categories = ["command-line-utilities"]
+
+# Keep this on anything that isn't EOL, we'll be nice to nixpkgs as long as
+# they don't literally actually unironically lock all our deps for us or go on
+# EOL rustc >_>
+#
+# ...also if we wanna play with bench we can probably cfg gate that :p
+rust-version = "1.80.1"
 
 [workspace.metadata.crane]
 name = "nix-weather"
