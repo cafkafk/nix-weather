@@ -14,7 +14,6 @@ pub fn get_requisites(host: &str, config_dir: &str) -> String {
     .current_dir(Path::new(config_dir))
     .args([
       "build",
-      "--impure",
       "--quiet",
       &format!(
         "./#nixosConfigurations.{}.config.system.build.toplevel",
@@ -22,9 +21,6 @@ pub fn get_requisites(host: &str, config_dir: &str) -> String {
       ),
       "--dry-run",
       "--json",
-      "--option",
-      "eval-cache",
-      "true",
     ])
     .output()
     .unwrap();
