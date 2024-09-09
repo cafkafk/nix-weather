@@ -17,4 +17,4 @@ jobs:
     runs-on: native
     steps:
       - uses: actions/checkout@v4
-      - uses: https://github.com/webiny/action-conventional-commits@v1.3.0
+      - uses: actions/action-conventional-commits@v1.3.0
