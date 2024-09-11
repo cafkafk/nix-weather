@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: EUPL-1.2
 
 {
-  description = "Nix Weather - Check Cache Availablility of NixOS Configurations";
+  description = "Nix Weather - Check Cache Availability of NixOS Configurations";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -13,10 +13,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    crane.url = "github:ipetkov/crane";
 
     fenix = {
       url = "github:nix-community/fenix";
@@ -244,7 +241,10 @@
           pre-commit-check =
             let
               # some treefmt formatters are not supported in pre-commit-hooks we filter them out for now.
-              toFilter = [ "yamlfmt" ];
+              toFilter = [
+                "yamlfmt"
+                "nixfmt"
+              ];
               filterFn = n: _v: (!builtins.elem n toFilter);
               treefmtFormatters = pkgs.lib.mapAttrs (_n: v: { inherit (v) enable; }) (
                 pkgs.lib.filterAttrs filterFn (import ./.config/treefmt.nix).programs
@@ -255,10 +255,12 @@
               hooks = treefmtFormatters // {
                 # not in treefmt
                 convco.enable = true;
+                # named nixfmt in treefmt (which defaults to nixfmt-classic for pre-commit-hooks)
+                nixfmt-rfc-style.enable = true;
                 reuse = {
                   enable = true;
                   name = "reuse";
-                  entry = with pkgs; "${pkgs.reuse}/bin/reuse lint";
+                  entry = with pkgs; "${reuse}/bin/reuse lint";
                   pass_filenames = false;
                 };
               };
