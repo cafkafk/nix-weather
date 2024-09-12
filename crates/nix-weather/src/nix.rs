@@ -33,7 +33,6 @@ fn get_installable_drv_path(
   installable: &str,
 ) -> std::io::Result<std::process::Output> {
   Command::new("nix")
-    .current_dir(Path::new(config_dir))
     .args(["build", "--quiet", installable, "--dry-run", "--json"])
     .output()
 }
