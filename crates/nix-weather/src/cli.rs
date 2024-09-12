@@ -6,12 +6,15 @@
 use clap::{arg, command, crate_authors, value_parser, ArgAction, Command};
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
+const DEFAULT_INSTALLABLE: &str = "./#nixosConfigurations.{}.config.system.build.toplevel";
 
 pub fn build_cli() -> Command {
   command!()
     .author(crate_authors!("\n"))
+    // TODO: parse multiple installables, like e.g. build does?
+    .arg(arg!([installable] "A nix installable").required(false))
     .arg(
-      arg!(--cache <CACHE> "check a specific cache")
+      arg!(--cache <CACHE> "Check a specific cache")
         .required(false)
         .default_value(DEFAULT_CACHE),
     )

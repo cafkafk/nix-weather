@@ -9,8 +9,9 @@ use std::{
   process::{Command, Stdio},
 };
 
-pub fn get_requisites(host: &str, config_dir: &str) -> String {
-  let get_drv_path = Command::new("nix")
+/// Get nixosConfiguration derivation path
+fn get_config_drv_path(host: &str, config_dir: &str) -> std::io::Result<std::process::Output> {
+  Command::new("nix")
     .current_dir(Path::new(config_dir))
     .args([
       "build",
@@ -23,10 +24,30 @@ pub fn get_requisites(host: &str, config_dir: &str) -> String {
       "--json",
     ])
     .output()
-    .unwrap();
+}
+
+/// Get installable derivation path
+fn get_installable_drv_path(
+  host: &str,
+  config_dir: &str,
+  installable: &str,
+) -> std::io::Result<std::process::Output> {
+  Command::new("nix")
+    .current_dir(Path::new(config_dir))
+    .args(["build", "--quiet", installable, "--dry-run", "--json"])
+    .output()
+}
+
+pub fn get_requisites(host: &str, config_dir: &str, installable: Option<String>) -> String {
+  let mut drv_path;
+  if let Some(installable) = installable {
+    drv_path = get_installable_drv_path(host, config_dir, &installable).unwrap();
+  } else {
+    drv_path = get_config_drv_path(host, config_dir).unwrap();
+  }
 
   let drv_path_json: Value =
-    serde_json::from_str(&String::from_utf8(get_drv_path.stdout).unwrap()).unwrap();
+    serde_json::from_str(&String::from_utf8(drv_path.stdout).unwrap()).unwrap();
   let drv_path = drv_path_json[0]["drvPath"].clone();
 
   log::debug!("drv_path: {}", &drv_path);

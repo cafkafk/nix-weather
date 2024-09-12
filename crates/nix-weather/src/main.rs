@@ -103,7 +103,11 @@ async fn main() -> io::Result<()> {
     .build()
     .unwrap();
 
-  let binding = get_requisites(&host_name, &config_dir);
+  let binding = get_requisites(
+    &host_name,
+    &config_dir,
+    matches.get_one::<String>("installable").cloned(),
+  );
 
   let get_requisites_duration = initial_time.elapsed().as_secs();
 
