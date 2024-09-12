@@ -37,6 +37,8 @@ async fn main() -> io::Result<()> {
   // message informing them.
   let mut very_bose = false;
 
+  // The Normal verbose flag, allowing multiple levels. Conflicts with
+  // printBuildLogs.
   match matches
     .get_one::<u8>("verbose")
     .expect("Counts aren't defaulted")
@@ -50,6 +52,11 @@ async fn main() -> io::Result<()> {
       very_bose = true;
       env::set_var("RUST_LOG", "trace")
     }
+  }
+
+  // The -L flag, to give a more nix3 feel
+  if matches.get_flag("printBuildLogs") {
+    env::set_var("RUST_LOG", "trace")
   }
 
   if matches.get_flag("timestamp") {

@@ -31,4 +31,9 @@ pub fn build_cli() -> Command {
         .required(false),
     )
     .arg(arg!(-v --verbose ... "Verbosity level."))
+    .arg(
+      arg!(printBuildLogs: -L "Verbosity level.")
+        .long("print-build-logs")
+        .conflicts_with("verbose"),
+    )
 }
