@@ -8,7 +8,7 @@ members = ["crates/*", "crates/workspace-hack"]
 
 [workspace.package]
 description = "Guix weather, for nix!"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 license = "EUPL-1.2"
 authors = ["Christina Sørensen <christina@cafkafk.com>"]
