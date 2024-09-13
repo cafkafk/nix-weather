@@ -6,7 +6,6 @@
 use clap::{arg, command, crate_authors, value_parser, ArgAction, Command};
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
-const DEFAULT_INSTALLABLE: &str = "./#nixosConfigurations.{}.config.system.build.toplevel";
 
 pub fn build_cli() -> Command {
   command!()

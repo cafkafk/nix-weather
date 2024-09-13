@@ -29,11 +29,7 @@ fn get_config_drv_path(host: &str, config_dir: &str) -> std::io::Result<std::pro
 
 /// Get installable derivation path
 #[inline]
-fn get_installable_drv_path(
-  host: &str,
-  config_dir: &str,
-  installable: &str,
-) -> std::io::Result<std::process::Output> {
+fn get_installable_drv_path(installable: &str) -> std::io::Result<std::process::Output> {
   Command::new("nix")
     .args(["build", "--quiet", installable, "--dry-run", "--json"])
     .output()
@@ -69,9 +65,9 @@ fn requisites_to_hashes(
 pub fn get_requisites(host: &str, config_dir: &str, installable: Option<String>) -> String {
   // If the users specified an installable, we interpret that, instead of trying
   // to guess their config location.
-  let mut drv_path;
+  let drv_path;
   if let Some(installable) = installable {
-    drv_path = get_installable_drv_path(host, config_dir, &installable).unwrap();
+    drv_path = get_installable_drv_path(&installable).unwrap();
   } else {
     drv_path = get_config_drv_path(host, config_dir).unwrap();
   }
