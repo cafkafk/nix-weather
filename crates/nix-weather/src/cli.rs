@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2023-2024 Christina Sørensen
 // SPDX-FileContributor: Christina Sørensen
+// SPDX-FileContributor: Maximilian Marx
 //
 // SPDX-License-Identifier: EUPL-1.2
 
-use clap::{arg, command, crate_authors, value_parser, ArgAction, Command};
+use clap::{arg, command, crate_authors, value_parser, ArgAction, ArgGroup, Command};
 
 const DEFAULT_CACHE: &str = "cache.nixos.org";
 
@@ -37,5 +38,12 @@ pub fn build_cli() -> Command {
       arg!(printBuildLogs: -L "Verbosity level.")
         .long("print-build-logs")
         .conflicts_with("verbose"),
+    )
+    .arg(arg!(-'4' --"only-ipv4" "Use IPv4 addresses only.").action(ArgAction::SetTrue))
+    .arg(arg!(-'6' --"only-ipv6" "Use IPv6 addresses only.").action(ArgAction::SetTrue))
+    .group(
+      ArgGroup::new("address_family")
+        .args(["only-ipv4", "only-ipv6"])
+        .required(false),
     )
 }
