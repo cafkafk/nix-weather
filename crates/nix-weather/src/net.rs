@@ -63,10 +63,31 @@ pub async fn nar_exists(client: Client, domain: &str, hash: &str, slide: u64) ->
   match response {
     Ok(response) if response.status().as_u16() == 200 => 1,
     Ok(response) if response.status().as_u16() == 404 => 0,
-    _ => {
+    Ok(response) if response.status().as_u16() == 429 => {
       // We're so fast now we get rate limited.
-      //
-      // Writng an actual sliding window seems kinda hard,
+
+      let wait = if let Some(retry_after) = response.headers().get("Retry-After") {
+        if let Ok(seconds) = String::from_utf8_lossy(retry_after.as_bytes()).parse::<u64>() {
+          seconds * 1000
+        } else {
+          slide
+        }
+      } else {
+        slide
+      };
+
+      sleep(Duration::from_millis(wait)).await;
+      Box::pin(nar_exists(
+        client,
+        domain,
+        hash,
+        std::cmp::min(slide * 2, MAX_SLIDE),
+      ))
+      .await
+    }
+    _ => {
+      // We might also be out of sockets, so let's wait on that
+      // Writing an actual sliding window seems kinda hard,
       // so we do this instead.
       log::trace!("rate limited! {slide}");
       sleep(Duration::from_millis(slide)).await;
