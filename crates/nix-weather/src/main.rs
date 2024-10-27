@@ -22,6 +22,9 @@ mod nix;
 /// The initial time to wait on http 104, in milliseconds
 const SLIDE: u64 = 100;
 
+// Open files limit to try to set
+const NOFILES_LIMIT: u64 = 16384;
+
 const DEFAULT_CACHE: &str = "cache.nixos.org";
 const DEFAULT_CONFIG_DIR: &str = "/etc/nixos";
 
@@ -108,6 +111,14 @@ async fn main() -> io::Result<()> {
     .collect();
 
   log::debug!("{:#?}", &ips);
+
+  // try to increase NOFILES runtime limit
+  if rlimit::increase_nofile_limit(NOFILES_LIMIT).is_err() {
+    log::warn!(
+      "Failed to increase NOFILES limit, still at {:#?}",
+      rlimit::Resource::NOFILE.get().unwrap_or_default()
+    );
+  }
 
   let domain_addr = SocketAddr::new(ips[0], 443);
 
