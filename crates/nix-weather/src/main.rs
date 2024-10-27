@@ -1,15 +1,17 @@
 // SPDX-FileCopyrightText: 2024 Christina Sørensen
 // SPDX-FileContributor: Christina Sørensen
+// SPDX-FileContributor: Maximilian Marx
 //
 // SPDX-License-Identifier: EUPL-1.2
 
+use std::sync::Arc;
 use std::time::Instant;
 use std::{env, io, net::SocketAddr};
 
-use dns_lookup::lookup_host;
 use futures::future::join_all;
 use gethostname::gethostname;
 use itertools::Itertools;
+use net::AddressFamilyFilter;
 
 use crate::nix::get_requisites;
 
@@ -91,14 +93,26 @@ async fn main() -> io::Result<()> {
     config_dir = DEFAULT_CONFIG_DIR.to_string();
   }
 
+  let address_family_filter = if matches.get_flag("only-ipv4") {
+    AddressFamilyFilter::OnlyIPv4
+  } else if matches.get_flag("only-ipv6") {
+    AddressFamilyFilter::OnlyIPv6
+  } else {
+    Default::default()
+  };
+
   let domain = cache_url.to_owned();
-  let ips: Vec<std::net::IpAddr> = lookup_host(&domain).unwrap();
+  let ips: Vec<std::net::IpAddr> = address_family_filter
+    .lookup_host(&domain)
+    .unwrap()
+    .collect();
 
   log::debug!("{:#?}", &ips);
 
   let domain_addr = SocketAddr::new(ips[0], 443);
 
   let client = reqwest::Client::builder()
+    .dns_resolver(Arc::new(address_family_filter))
     .resolve(&domain, domain_addr)
     .build()
     .unwrap();
